@@ -22,7 +22,7 @@ impl Optimizer {
                 loc == l
             });
         match found {
-            Some(&(_, ref elm)) => Some(elm),    
+            Some(&(_, ref elm)) => Some(elm),
             None => None,
         }
     }
@@ -94,9 +94,7 @@ impl Optimizer {
     pub fn optimize(&self, settings: &Settings) -> Vec<Element> {
         let mut optimized = vec![];
         for &(ref loc, ref elem) in &self.elements {
-            if self.is_edible(&loc) {
-                ;
-            } else {
+            if !self.is_edible(loc) {
                 for e in elem {
                     let traced = self.trace_elements(e, loc);
                     optimized.push(traced);

@@ -14,8 +14,7 @@ fn main() {
 }
 
 fn get_arg() -> &'static str{
-
-let arg = r#"
+    r#"
 
 
 +------+   +-----+   +-----+   +-----+
@@ -53,7 +52,7 @@ let arg = r#"
                 /      \
             .--'        \___
            /                \
-          v                  v 
+          v                  v
        User code            OS code
 
              .---.  .---. .---.  .---.    .---.  .---.
@@ -73,7 +72,7 @@ let arg = r#"
              .---------------------------------------.
              |                  HAL                  |
              '---------------------------------------'
-             
+
 
    ____[]
   | ___ |
@@ -94,7 +93,7 @@ let arg = r#"
                           |    .------------------.   |             |
                           |   / A.instrumented.o /<---+-------------'
                           |  '------------------'     |    calls
-                          '---------------------------'   
+                          '---------------------------'
 
         .--------------.
          \              \
@@ -102,17 +101,17 @@ let arg = r#"
 
                                         .--> Base::Class::Derived_A
                                        /
-                                      .----> Base::Class::Derived_B    
+                                      .----> Base::Class::Derived_B
       Something -------.             /         \
                         \           /           .---> Base::Class::Derived
       Something::else    \         /             \
             \             \       /               '--> Base::Class::Derived
              \             \     /
-              \             \   .-----------> Base::Class::Derived_C 
+              \             \   .-----------> Base::Class::Derived_C
                \             \ /
                 '------ Base::Class
                        /  \ \ \
-                      '    \ \ \  
+                      '    \ \ \
                       |     \ \ \
                       .      \ \ '--- The::Latest
                      /|       \ \      \
@@ -122,10 +121,8 @@ let arg = r#"
                      /|           \
          More::Stuff  '            \
                      /              '--- Last::One
-       More::Stuff  V 
+       More::Stuff  V
 
 
-"#;
-
-arg
+"#
 }

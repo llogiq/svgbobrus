@@ -261,11 +261,10 @@ impl Element {
                         // note* dual 3 point check for trully collinear lines
                         if collinear(s, e, s2) && collinear(s, e, e2) && e == s2 &&
                            stroke == stroke2 && feature.is_none() {
-                            let reduced = Some(Element::Line(s.clone(),
-                                                             e2.clone(),
-                                                             stroke.clone(),
-                                                             feature2.clone()));
-                            reduced
+                            Some(Element::Line(s.clone(),
+                                               e2.clone(),
+                                               stroke.clone(),
+                                               feature2.clone()))
                         } else {
                             None
                         }
@@ -280,8 +279,7 @@ impl Element {
                         let len = text.len() as isize;
                         if loc.y == loc2.y && loc.x + len == loc2.x {
                             let merged_text = text.clone() + text2;
-                            let reduced = Some(Element::Text(loc.clone(), merged_text));
-                            reduced
+                            Some(Element::Text(loc.clone(), merged_text))
                         } else {
                             None
                         }
@@ -303,11 +301,8 @@ impl Element {
                     .set("x2", e.x)
                     .set("y2", e.y);
 
-                match *feature {
-                    Some(Feature::Arrow) => {
-                        svg_line.assign("marker-end", "url(#triangle)");
-                    }
-                    None => (),
+                if let Some(Feature::Arrow) = *feature {
+                    svg_line.assign("marker-end", "url(#triangle)");
                 };
                 match *stroke {
                     Stroke::Solid => (),
@@ -375,12 +370,11 @@ pub struct Grid {
 }
 impl Grid {
     pub fn from_str(s: &str) -> Grid {
-        let lines: Vec<Vec<char>> = s.split("\n")
+        let lines: Vec<Vec<char>> = s.split('\n')
             .map(|l| l.trim_right().chars().collect())
             .collect();
 
-        let max = lines.iter()
-            .fold(0, |acc, ref x| if x.len() > acc { x.len() } else { acc });
+        let max = lines.iter().map(Vec::len).max().unwrap_or(0);
 
         Grid {
             rows: lines.len(),
@@ -582,7 +576,7 @@ impl Grid {
         let right_right = &this.right_right();
 
 
-        let match_list: Vec<(bool, Vec<Element>)> = 
+        let match_list: Vec<(bool, Vec<Element>)> =
             vec![
                 /*
                     |
@@ -606,7 +600,7 @@ impl Grid {
                 /*
                    :
                    :
-                   must have at least 1 align to it to be treated as vertical 
+                   must have at least 1 align to it to be treated as vertical
                 */
                 (self.is_char(this, is_vertical_dashed)
                   && (self.is_char(top, is_vertical_dashed)
@@ -639,11 +633,11 @@ impl Grid {
                   && ((self.is_char(left, is_low_horizontal_dashed) //left & right
                       && self.is_char(right, is_low_horizontal_dashed)
                       )
-                     || 
+                     ||
                       (self.is_char(left, is_low_horizontal_dashed)
                        && self.is_char(left_left, is_low_horizontal_dashed)
                       )
-                     || 
+                     ||
                       (self.is_char(right, is_low_horizontal_dashed)
                        && self.is_char(right_right, is_low_horizontal_dashed)
                       )
@@ -698,7 +692,7 @@ impl Grid {
                 ),
                 /*
                     <-
-                     
+
                 */
                 (self.is_char(this, is_arrow_left)
                  && self.is_char(right, is_horizontal),
@@ -706,7 +700,7 @@ impl Grid {
                 ),
                 /*
                     <=
-                     
+
                 */
                 (self.is_char(this, is_arrow_left)
                  && self.is_char(right, is_horizontal_dashed),
@@ -714,7 +708,7 @@ impl Grid {
                 ),
                 /*
                     ->
-                     
+
                 */
                 (self.is_char(this, is_arrow_right)
                  && self.is_char(left, is_horizontal),
@@ -722,7 +716,7 @@ impl Grid {
                 ),
                 /*
                     =>
-                     
+
                 */
                 (self.is_char(this, is_arrow_right)
                  && self.is_char(left, is_horizontal_dashed),
@@ -746,7 +740,7 @@ impl Grid {
                 ),
                 /*
                       /
-                     V 
+                     V
                 */
                 (self.is_char(this, is_arrow_down)
                  && self.is_char(top_right, is_slant_right),
@@ -754,7 +748,7 @@ impl Grid {
                 ),
                 /*
                       \
-                       V 
+                       V
                 */
                 (self.is_char(this, is_arrow_down)
                  && self.is_char(top_left, is_slant_left),
@@ -782,7 +776,7 @@ impl Grid {
                 ),
                 /*
                        /_
-                     
+
                 */
                 (self.is_char(this, is_low_horizontal)
                  && self.is_char(left, is_slant_right),
@@ -790,7 +784,7 @@ impl Grid {
                 ),
                 /*
                        _\
-                     
+
                 */
                 (self.is_char(this, is_low_horizontal)
                  && self.is_char(right, is_slant_left),
@@ -798,7 +792,7 @@ impl Grid {
                 ),
                 /*
                       +-
-                      | 
+                      |
                 */
                 (self.is_char(this, is_intersection)
                  && self.is_char(right, is_horizontal)
@@ -807,7 +801,7 @@ impl Grid {
                 ),
                 /*
                      -+
-                      | 
+                      |
                 */
                 (self.is_char(this, is_intersection)
                  && self.is_char(left, is_horizontal)
@@ -834,7 +828,7 @@ impl Grid {
                 ),
                 /*
                       .-
-                      | 
+                      |
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(right, is_horizontal)
@@ -843,7 +837,7 @@ impl Grid {
                 ),
                 /*
                       -.
-                       | 
+                       |
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(left, is_horizontal)
@@ -851,8 +845,8 @@ impl Grid {
                  vec![cxdy_cxey.clone(), arc_cxdy_axcy.clone()]
                 ),
                 /*
-                     | 
-                     '- 
+                     |
+                     '-
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(right, is_horizontal)
@@ -860,8 +854,8 @@ impl Grid {
                  vec![cxay_cxby.clone(), arc_cxby_excy.clone()]
                 ),
                 /*
-                     | 
-                    -' 
+                     |
+                    -'
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(left, is_horizontal)
@@ -869,8 +863,8 @@ impl Grid {
                  vec![cxay_cxby.clone(), arc_axcy_cxby.clone()]
                 ),
                 /*
-                    .-  
-                   / 
+                    .-
+                   /
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(right, is_horizontal)
@@ -878,8 +872,8 @@ impl Grid {
                  vec![axey_bxdy.clone(), arc_excy_bxdy.clone()]
                 ),
                 /*
-                   -.  
-                     \ 
+                   -.
+                     \
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(left, is_horizontal)
@@ -887,8 +881,8 @@ impl Grid {
                  vec![exey_dxdy.clone(), arc_dxdy_axcy.clone()]
                 ),
                 /*
-                   -.  
-                   / 
+                   -.
+                   /
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(left, is_horizontal)
@@ -905,8 +899,8 @@ impl Grid {
                  vec![exey_dxdy.clone(), arc_excy_dxdy.clone()]
                 ),
                 /*
-                   \  
-                    '-  
+                   \
+                    '-
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(right, is_horizontal)
@@ -914,8 +908,8 @@ impl Grid {
                  vec![axay_bxby.clone(), arc_bxby_excy.clone()]
                 ),
                 /*
-                     / 
-                    '-  
+                     /
+                    '-
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(right, is_horizontal)
@@ -961,8 +955,8 @@ impl Grid {
                  vec![exay_dxby.clone(),exey_dxdy.clone(), arc_dxby_dxdy.clone()]
                 ),
                 /*
-                      / 
-                     .  
+                      /
+                     .
                      |
                 */
                 (self.is_char(this, is_round)
@@ -971,8 +965,8 @@ impl Grid {
                  vec![exay_dxby.clone(),cxey_cxdy.clone(), arc_dxby_cxdy.clone()]
                 ),
                 /*
-                     | 
-                     .  
+                     |
+                     .
                     /
                 */
                 (self.is_char(this, is_round)
@@ -982,8 +976,8 @@ impl Grid {
                 ),
                 /*
                     \
-                     .  
-                     | 
+                     .
+                     |
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(bottom, is_vertical)
@@ -992,8 +986,8 @@ impl Grid {
                 ),
                 /*
                      |
-                     .  
-                      \ 
+                     .
+                      \
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(top, is_vertical)
@@ -1026,7 +1020,7 @@ impl Grid {
                     \
                     -.
                       \
-                   
+
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(left, is_horizontal)
@@ -1038,7 +1032,7 @@ impl Grid {
                     \
                      .-
                       \
-                   
+
                 */
                 (self.is_char(this, is_round)
                  && self.is_char(right, is_horizontal)
@@ -1089,8 +1083,8 @@ impl Grid {
                  vec![vertical.clone(), cxcy_excy.clone()]
                 ),
                 /*
-                     | 
-                     .  
+                     |
+                     .
                     /|
                 */
                 (self.is_char(this, is_round)
@@ -1100,8 +1094,8 @@ impl Grid {
                  vec![vertical.clone(), axey_bxdy.clone(), arc_bxdy_cxby.clone()]
                 ),
                 /*
-                     | 
-                     .  
+                     |
+                     .
                      |\
                 */
                 (self.is_char(this, is_round)
@@ -1111,9 +1105,9 @@ impl Grid {
                  vec![vertical.clone(), exey_dxdy.clone(), arc_cxby_dxdy.clone()]
                 ),
                 /*
-                    |  
+                    |
                    -+-
-                    | 
+                    |
                 */
                 ((self.is_char(this, is_intersection) || self.is_char(this, is_round) || self.is_char(this, is_marker))
                  && self.is_char(top, is_vertical)
@@ -1123,9 +1117,9 @@ impl Grid {
                  vec![vertical.clone(), horizontal.clone()]
                 ),
                 /*
-                    :  
+                    :
                    =+=
-                    : 
+                    :
                 */
                 ((self.is_char(this, is_intersection) || self.is_char(this, is_round) || self.is_char(this, is_marker))
                  && self.is_char(top, is_vertical_dashed)
@@ -1135,8 +1129,8 @@ impl Grid {
                  vec![vertical_dashed.clone(), horizontal_dashed.clone()]
                 ),
                 /*
-                   \|/ 
-                    + 
+                   \|/
+                    +
                    /|\
                 */
                 ((self.is_char(this, is_intersection) || self.is_char(this, is_round) || self.is_char(this, is_marker))
@@ -1149,7 +1143,7 @@ impl Grid {
                  vec![vertical.clone(), slant_left.clone(), slant_right.clone()]
                 ),
                 /*
-                   \|/ 
+                   \|/
                    -+-
                    /|\
                 */
@@ -1172,7 +1166,7 @@ impl Grid {
                 cond
             });
 
-        let paths: Option<Vec<Element>> = match match_path {
+        match match_path {
             Some((_, paths)) => Some(paths),
             None => {
                 let ch = self.get(this);
@@ -1191,10 +1185,7 @@ impl Grid {
                     None => None,
                 }
             }
-        };
-
-        paths
-
+        }
     }
 
     fn get_all_elements(&self, settings: &Settings) -> Vec<(Loc, Vec<Element>)> {
@@ -1204,13 +1195,8 @@ impl Grid {
             for column in 0..line.len() {
                 let x = column as isize;
                 let y = row as isize;
-                match self.get_elements(x, y, settings) {
-                    Some(paths) => {
-                        all_paths.push((Loc::new(x, y), paths));
-                    }
-                    None => {
-                        ();
-                    }
+                if let Some(paths) = self.get_elements(x, y, settings) {
+                    all_paths.push((Loc::new(x, y), paths));
                 }
             }
         }
@@ -1223,9 +1209,7 @@ impl Grid {
         let mut nodes = vec![];
         let elements = self.get_all_elements(settings);
         let input = if settings.optimize {
-            let optimizer = Optimizer::new(elements);
-            let optimized_elements = optimizer.optimize(settings);
-            optimized_elements
+            Optimizer::new(elements).optimize(settings)
         } else {
             elements.into_iter().flat_map(|(_, elm)| elm).collect()
         };
@@ -1383,14 +1367,12 @@ fn escape_char(ch: &char) -> String {
             let &(e, _) = *pair;
             e == *ch
         });
-    let quoted: String = match quote_match {
+    match quote_match {
         Some(&(_, quoted)) => String::from(quoted),
         None => {
             let mut s = String::new();
             s.push(*ch);
             s
         }
-    };
-    quoted
-
+    }
 }
